@@ -27,7 +27,7 @@ set background=dark
 
 " Enable true colour mode
 set termguicolors
-silent! colorscheme monokai
+silent! colorscheme unokai
 
 " Make it highlight red when I go beyond 80 lines.
 "match Error /\%91v.\+/
@@ -78,10 +78,12 @@ autocmd VimEnter * AirlineTheme powerlineish
 " Use spaces instead just for yaml
 autocmd Filetype yaml setl expandtab
 
-" Enable marker based folding
-set foldmethod=marker
+" Enable ufo code folding
+set foldenable
+set foldcolumn=auto:9
+set foldlevel=99
+set foldlevelstart=99
 
-set nofoldenable
 
 set ls=3
 

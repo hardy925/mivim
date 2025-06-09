@@ -73,6 +73,10 @@ Plug 'numToStr/Comment.nvim'
 " better scrolling visuals
 Plug 'karb94/neoscroll.nvim'
 
+" code folding
+Plug 'kevinhwang91/promise-async'
+Plug 'kevinhwang91/nvim-ufo'
+
 " paste images
 Plug 'hakonharnes/img-clip.nvim'
 
@@ -99,47 +103,56 @@ autocmd! User avante.nvim
 
 " run any plugin setup after calling plug#end()
 lua << EOF
--- Helper: safely require a module
-local function safe_require(name)
-  local ok, mod = pcall(require, name)
-  return ok and mod or nil
-end
-
--- Comment.nvim setup
-local comment = safe_require("Comment")
-if comment then
-  comment.setup()
-end
-
--- render-markdown.nvim setup
-local render = safe_require("render-markdown")
-if render then
-  render.setup({
-    file_types = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
-    latex = { enabled = false },
-  })
-end
-
--- nvim-treesitter setup
-local ts = safe_require("nvim-treesitter.configs")
-if ts then
-  ts.setup({
-    ensure_installed = "all",
-    sync_install = false,
-    auto_install = true,
-    highlight = {
-      enable = true,
-      additional_vim_regex_highlighting = false,
-    },
-  })
-end
-
--- avante.nvim setup
-local avante = safe_require("avante")
-if avante then
-  avante.setup({
-    provider = "copilot",
-  })
-end
+	-- Helper: safely require a module
+	local function safe_require(name)
+	  local ok, mod = pcall(require, name)
+	  return ok and mod or nil
+	end
+	
+	-- Comment.nvim setup
+	local comment = safe_require("Comment")
+	if comment then
+	  comment.setup()
+	end
+	
+	-- ufo setup
+	local ufo = safe_require("ufo")
+	if ufo then
+		vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+		vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
+		vim.o.fillchars = [[eob: ,fold: ,foldopen:⌄,foldsep:│,foldclose:›]]
+	  ufo.setup()
+	end
+	
+	-- render-markdown.nvim setup
+	local render = safe_require("render-markdown")
+	if render then
+	  render.setup({
+	    file_types = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
+	    latex = { enabled = false },
+	  })
+	end
+	
+	-- nvim-treesitter setup
+	local ts = safe_require("nvim-treesitter.configs")
+	if ts then
+	  ts.setup({
+	    ensure_installed = "all",
+	    sync_install = false,
+	    auto_install = true,
+	    highlight = {
+	      enable = true,
+	      additional_vim_regex_highlighting = false,
+	    },
+	  })
+	end
+	
+	-- avante.nvim setup
+	local avante = safe_require("avante")
+	if avante then
+	  avante.setup({
+	    provider = "copilot",
+	  })
+	end
 EOF
 
