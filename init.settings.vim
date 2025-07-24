@@ -80,7 +80,7 @@ autocmd Filetype yaml setl expandtab
 
 " Enable ufo code folding
 set foldenable
-set foldcolumn=auto:9
+set foldcolumn=1
 set foldlevel=99
 set foldlevelstart=99
 
@@ -95,13 +95,16 @@ let g:netrw_liststyle=3 " tree view
 " let g:netrw_list_hide=netrw_gitignore#Hide()
 
 " git lens
-let g:blamer_enabled = 1
+let g:blamer_enabled = 0
 let g:blamer_delay = 350
 let g:blamer_prefix = ' -- '
 
 " Make clearing the last used search pattern easy
 "
 nnoremap <silent> q, :let @/ = ""<CR>
+
+" Don't touch unnamed register when pasting over visual selection
+xnoremap <expr> p 'pgv"' . v:register . 'y'
 
 " Execute the passed search command, but check has the last used
 " search pattern been cleared and do nothing in that case, to fix
@@ -119,3 +122,6 @@ nnoremap <silent> N :call ExecuteSearch("N")<CR>
 
 " nice git messages
 autocmd Filetype gitcommit setl colorcolumn=72
+
+" set syntax highlights for CODEOWNERS files
+au BufRead,BufNewFile CODEOWNERS,**/CODEOWNERS,.github/CODEOWNERS set filetype=codeowners

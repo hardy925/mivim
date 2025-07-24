@@ -77,6 +77,9 @@ Plug 'karb94/neoscroll.nvim'
 Plug 'kevinhwang91/promise-async'
 Plug 'kevinhwang91/nvim-ufo'
 
+" CODEOWNERS syntax
+Plug 'rhysd/vim-syntax-codeowners'
+
 " paste images
 Plug 'hakonharnes/img-clip.nvim'
 
@@ -114,6 +117,34 @@ lua << EOF
 	if comment then
 	  comment.setup()
 	end
+
+	local handler = function(virtText, lnum, endLnum, width, truncate)
+    local newVirtText = {}
+    local suffix = (' 󰁂 %d '):format(endLnum - lnum)
+    local sufWidth = vim.fn.strdisplaywidth(suffix)
+    local targetWidth = width - sufWidth
+    local curWidth = 0
+    for _, chunk in ipairs(virtText) do
+        local chunkText = chunk[1]
+        local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+        if targetWidth > curWidth + chunkWidth then
+            table.insert(newVirtText, chunk)
+        else
+            chunkText = truncate(chunkText, targetWidth - curWidth)
+            local hlGroup = chunk[2]
+            table.insert(newVirtText, {chunkText, hlGroup})
+            chunkWidth = vim.fn.strdisplaywidth(chunkText)
+            -- str width returned from truncate() may less than 2nd argument, need padding
+            if curWidth + chunkWidth < targetWidth then
+                suffix = suffix .. (' '):rep(targetWidth - curWidth - chunkWidth)
+            end
+            break
+        end
+        curWidth = curWidth + chunkWidth
+    end
+    table.insert(newVirtText, {suffix, 'MoreMsg'})
+    return newVirtText
+	end
 	
 	-- ufo setup
 	local ufo = safe_require("ufo")
@@ -121,7 +152,9 @@ lua << EOF
 		vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
 		vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 		vim.o.fillchars = [[eob: ,fold: ,foldopen:⌄,foldsep:│,foldclose:›]]
-	  ufo.setup()
+	  ufo.setup({
+    	fold_virt_text_handler = handler
+		})
 	end
 	
 	-- render-markdown.nvim setup
